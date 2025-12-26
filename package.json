@@ -1,0 +1,19 @@
+{
+  "name": "4project",
+  "version": "1.0.0",
+  "description": "A project management application",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "keywords": [
+    "backend",
+    "API"
+  ],
+  "author": "Mudassir Siddiqui",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "3.7.4"
+  }
+}
