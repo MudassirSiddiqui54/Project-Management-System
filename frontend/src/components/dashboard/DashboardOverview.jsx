@@ -276,7 +276,7 @@ export default function DashboardOverview() {
 							to="/dashboard/projects/new"
 							className={`flex items-center justify-between p-4 rounded-xl border transition ${
 								isDark
-									? "border-gray-800 hover:border-lime-500 hover:bg-gray-800/50"
+									? "border-gray-800 hover:border-lime-500 hover:bg-gray-800/50 text-gray-100"
 									: "border-gray-200 hover:border-lime-500 hover:bg-gray-50"
 							}`}
 						>
@@ -299,7 +299,7 @@ export default function DashboardOverview() {
 							to="/dashboard/tasks/new"
 							className={`flex items-center justify-between p-4 rounded-xl border transition ${
 								isDark
-									? "border-gray-800 hover:border-lime-500 hover:bg-gray-800/50"
+									? "border-gray-800 hover:border-lime-500 hover:bg-gray-800/50 text-gray-100"
 									: "border-gray-200 hover:border-lime-500 hover:bg-gray-50"
 							}`}
 						>
@@ -320,7 +320,7 @@ export default function DashboardOverview() {
 							to="/dashboard/members/invite"
 							className={`flex items-center justify-between p-4 rounded-xl border transition ${
 								isDark
-									? "border-gray-800 hover:border-lime-500 hover:bg-gray-800/50"
+									? "border-gray-800 hover:border-lime-500 hover:bg-gray-800/50 text-gray-100"
 									: "border-gray-200 hover:border-lime-500 hover:bg-gray-50"
 							}`}
 						>

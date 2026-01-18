@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext.jsx";
 import { useTheme } from "../ThemeContext.jsx";
 import {
@@ -15,6 +15,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 export default function DashboardLayout() {
+	const navigate = useNavigate();
 	const { user, logout } = useAuth();
 	const { isDark } = useTheme();
 	const location = useLocation();
@@ -54,12 +55,8 @@ export default function DashboardLayout() {
 	];
 
 	const handleLogout = async () => {
-		try {
-			await logout(); // You'll need to create logout API call
-			window.location.href = "/login";
-		} catch (error) {
-			console.error("Logout failed:", error);
-		}
+		await logout(); // clears backend + state
+		navigate("/"); // SPA redirect
 	};
 
 	return (
@@ -136,7 +133,7 @@ export default function DashboardLayout() {
 						isDark ? "bg-gray-900" : "bg-white"
 					} border-r ${
 						isDark ? "border-gray-800" : "border-gray-200"
-					} min-h-screen fixed`}
+					} min-h-screen `}
 				>
 					<SidebarContent
 						navItems={navItems}
@@ -147,13 +144,13 @@ export default function DashboardLayout() {
 					/>
 				</div>
 
-				{/* Main Content */}
-				<div className="flex-1 lg:ml-64">
+				{/* Main Content (add top padding to account for sticky Navigation/header) */}
+				<div className="flex-1">
 					<Outlet />
 				</div>
 			</div>
 
-			{/* Mobile Main Content */}
+			{/* Mobile Main Content (pad for mobile header) */}
 			<div className="lg:hidden">
 				<Outlet />
 			</div>

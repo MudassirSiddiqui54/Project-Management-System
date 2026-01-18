@@ -1,5 +1,9 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { getCurrentUser } from "../api/auth.api";
+import {
+	getCurrentUser,
+	logout as logoutApi,
+	login as loginApi,
+} from "../api/auth.api";
 
 const AuthContext = createContext();
 
@@ -14,7 +18,7 @@ export const AuthProvider = ({ children }) => {
 	const checkAuth = async () => {
 		try {
 			const response = await getCurrentUser();
-			setUser(response.data.user);
+			setUser(response.data.data);
 		} catch (error) {
 			setUser(null);
 		} finally {
@@ -24,11 +28,18 @@ export const AuthProvider = ({ children }) => {
 
 	const login = (userData) => {
 		setUser(userData);
+		window.location.href = "/dashboard";
 	};
 
 	const logout = async () => {
-		setUser(null);
-		// You might want to call logout API here
+		try {
+			await logoutApi(); // backend clears cookie
+		} catch (err) {
+			// ignore 401 here, see explanation below
+		} finally {
+			setUser(null);
+			window.location.href = "/";
+		}
 	};
 
 	const value = {

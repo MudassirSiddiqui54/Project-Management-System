@@ -5,23 +5,25 @@ import {
 	UserIcon,
 	ArrowRightIcon,
 } from "@heroicons/react/24/outline";
-import { useAuth, AuthProvider } from "./AuthContext.jsx";
+import { useAuth } from "./AuthContext.jsx";
 
 export default function Navigation() {
 	const { isDark, toggleTheme } = useTheme();
-	const { user, isAuthenticated } = useAuth();
+	const { user, isAuthenticated, loading } = useAuth();
 	const location = useLocation();
 
 	// Don't show nav on auth pages
 	const hideNavPaths = ["/login", "/register", "/forgot-password"];
 	if (hideNavPaths.includes(location.pathname)) return null;
+	// While we are checking auth, don't render nav to avoid flicker
+	if (loading) return null;
 
 	return (
 		<nav
 			className={`sticky top-0 z-50 ${
 				isDark
-					? "bg-gray-900/80 backdrop-blur-lg"
-					: "bg-white/80 backdrop-blur-lg"
+					? "bg-gray-900/70 backdrop-blur-md"
+					: "bg-white/70 backdrop-blur-md"
 			} border-b ${isDark ? "border-gray-800" : "border-gray-200"}`}
 		>
 			<div className="container mx-auto px-4 py-3">
@@ -108,8 +110,8 @@ export default function Navigation() {
 									to="/dashboard"
 									className={`px-4 py-2 rounded-lg font-medium ${
 										isDark
-											? "bg-gray-800 hover:bg-gray-700"
-											: "bg-gray-100 hover:bg-gray-200"
+											? "bg-gray-800 text-gray-100 hover:bg-gray-700"
+											: "bg-gray-100 text-gray-900 hover:bg-gray-200"
 									}`}
 								>
 									Dashboard
@@ -118,7 +120,7 @@ export default function Navigation() {
 									<button
 										className={`flex items-center space-x-2 p-2 rounded-lg ${
 											isDark
-												? "hover:bg-gray-800"
+												? "hover:bg-gray-800 text-gray-100"
 												: "hover:bg-gray-100"
 										}`}
 									>

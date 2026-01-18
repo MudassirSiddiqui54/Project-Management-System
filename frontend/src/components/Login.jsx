@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { login } from "../api/auth.api";
+import { login as loginApi, resendEmailVerification } from "../api/auth.api";
 import { useTheme } from "./ThemeContext.jsx";
+import { useAuth } from "./AuthContext.jsx";
 import {
 	EyeIcon,
 	EyeSlashIcon,
@@ -12,12 +13,14 @@ import {
 
 export default function Login() {
 	const { isDark } = useTheme();
+	const { login } = useAuth();
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
+	const [needsVerification, setNeedsVerification] = useState(false);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -25,19 +28,43 @@ export default function Login() {
 		setLoading(true);
 
 		try {
-			// ✅ CONNECTS TO YOUR BACKEND
-			const response = await login({ email, password });
-
-			// Redirect to dashboard
+			const response = await loginApi({ email, password });
+			login(response.data.data);
+			setNeedsVerification(false);
+			setError("");
 			window.location.href = "/dashboard";
 		} catch (err) {
-			// ✅ YOUR BACKEND ERROR HANDLING
-			setError(
-				err.response?.data?.message ||
-					"Login failed. Check credentials."
-			);
+			console.log("LOGIN ERROR RAW:", err);
+			console.log("LOGIN ERROR RESPONSE:", err.response);
+			const status = err.response?.status;
+			const message = err.response?.data?.message;
+
+			if (status === 403 && message?.toLowerCase().includes("verify")) {
+				setNeedsVerification(true);
+				setError(message);
+			} else {
+				setNeedsVerification(false);
+				setError(message || "Login failed. Check credentials.");
+			}
 		} finally {
 			setLoading(false);
+		}
+	};
+	const handleResendVerification = async () => {
+		try {
+			await resendEmailVerification({ email }); // pass email from state
+			setError("Verification email sent. Check your inbox.");
+			setNeedsVerification(false);
+		} catch (err) {
+			const status = err.response?.status;
+			const message = err.response?.data?.message;
+
+			if (status === 409) {
+				setNeedsVerification(false);
+				setError("Email already verified. Please log in.");
+			} else {
+				setError(message || "Failed to resend verification email");
+			}
 		}
 	};
 
@@ -175,7 +202,7 @@ export default function Login() {
 						</a>
 					</div>
 
-					{/* Error from YOUR backend */}
+					{/* Error from backend */}
 					{error && (
 						<div
 							className={`p-3 rounded-lg ${
@@ -184,7 +211,19 @@ export default function Login() {
 									: "bg-red-50 text-red-700"
 							}`}
 						>
-							{error}
+							<p>{error}</p>
+
+							{needsVerification && (
+								<p className="mt-2 text-sm">
+									<button
+										type="button"
+										onClick={handleResendVerification}
+										className="underline font-medium text-lime-500 hover:text-lime-400"
+									>
+										Resend verification email
+									</button>
+								</p>
+							)}
 						</div>
 					)}
 

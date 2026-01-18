@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { useTheme } from "../components/ThemeContext.jsx";
-import Navigation from "../components/Navigation.jsx";
 import {
 	CheckCircleIcon,
 	UserGroupIcon,
@@ -45,9 +44,6 @@ export default function HomePage() {
 				isDark ? "bg-gray-950 text-white" : "bg-gray-50 text-gray-900"
 			}`}
 		>
-			{/* Navigation */}
-			<Navigation />
-
 			{/* Hero Section */}
 			<div className="container mx-auto px-4 py-16 md:py-24">
 				<div className="text-center max-w-4xl mx-auto">

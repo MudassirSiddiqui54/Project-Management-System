@@ -7,8 +7,9 @@ export const logout = () => api.post("/auth/logout");
 export const refreshToken = () => api.post("/auth/refresh-token");
 
 
-export const resendEmailVerification = () => 
-    api.post("/auth/resend-email-verification");
+export const resendEmailVerification = (data) => 
+    api.post("/auth/resend-email-verification", data); //send email
+
 
 // Password management
 export const changeCurrentPassword = (data) => 

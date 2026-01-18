@@ -38,8 +38,13 @@ app.use("/api/v1/subtasks", subtaskRouter);
 app.use("/api/v1/notes", noteRouter);
 
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
+app.use((err, req, res, next) => {
+	const statusCode = err.statusCode || 500;
+
+	res.status(statusCode).json({
+		success: false,
+		message: err.message || "Internal Server Error",
+	});
 });
 
 

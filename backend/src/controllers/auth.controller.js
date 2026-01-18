@@ -47,7 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
         subject: "Please verify your email",
         mailGenContent: emailVerificationMailgenContent(
             user.username,
-            `${process.env.CLIENT_URL}/api/v1/users/verify-email/${unHashedToken}`
+            `${process.env.CLIENT_URL}/verify-email/${unHashedToken}`
         )
     });
     //We don't need password, refreshToken, emailVerificationToken ... so we use -variable to exclude them from saving 
@@ -73,6 +73,12 @@ const login = asyncHandler(async (req, res) => {
     if(!user){
         throw new ApiError(400, "User does not exists.")
     }
+    console.log("LOGIN isEmailVerified:", user.isEmailVerified);
+
+    if(!(user.isEmailVerified)){
+        throw new ApiError(403, "Please verify your email first")
+    }
+
 
     const isPasswordValid = await user.isPasswordCorrect(password)
     if(!isPasswordValid){
@@ -86,6 +92,7 @@ const login = asyncHandler(async (req, res) => {
         httpOnly: true,
         secure: true
     }
+    
     return res
         .status(200)
         .cookie("accessToken", accessToken, options)
@@ -102,30 +109,29 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-    await User.findByIdAndUpdate(
-        req.user._id,
-        {
-            $set: {
-                refreshToken: ""
-            }
-        },
-        {
-            //gives the updated object
-            new: true
-        }
-    );
-    const options = {
-        httpOnly: true,
-        secure: true
-    }
-    return res
-        .status(200)
-        .clearCookie("accessToken", options)
-        .clearCookie("refreshToken", options)
-        .json(
-            new ApiResponse(200,{}, "User logged out")
-        )
-})
+	try {
+		if (req.user?._id) {
+			await User.findByIdAndUpdate(req.user._id, {
+				$set: { refreshToken: "" },
+			});
+		}
+	} catch (err) {
+		// swallow error, logout must not fail
+	}
+
+	const options = {
+		httpOnly: true,
+		secure: true,
+		sameSite: "strict",
+	};
+
+	return res
+		.status(200)
+		.clearCookie("accessToken", options)
+		.clearCookie("refreshToken", options)
+		.json({ message: "User logged out" });
+});
+
 
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
@@ -158,6 +164,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
     user.isEmailVerified = true;
     await user.save({validateBeforeSave: false})
 
+
     return res
         .status(200)
         .json(
@@ -169,43 +176,51 @@ const verifyEmail = asyncHandler(async (req, res) => {
                 "Email is verified"
             )
         )
+        .redirect(
+		`${process.env.CLIENT_URL}/email-verified?success=true`
+	);
 })
 
 const resendEmailVerification = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user?._id)
-    if(!user){
-        throw new ApiError(404, "User doesn't exist")
-    }
-    if(user.isEmailVerified){
-        throw new ApiError(409, "Email is already verified")
+    // Expect email in body instead of req.user
+    const { email } = req.body;
+    if (!email) {
+        throw new ApiError(400, "Email is required to resend verification link");
     }
 
-    const {unHashedToken, hashedToken, tokenExpiry} = user.generateTemporaryToken();
+    const user = await User.findOne({ email });
+    if (!user) {
+        throw new ApiError(404, "User doesn't exist");
+    }
+
+    if (user.isEmailVerified) {
+        return res
+            .status(409)
+            .json(new ApiResponse(409, {}, "Email is already verified. Please log in."));
+    }
+
+    const { unHashedToken, hashedToken, tokenExpiry } = user.generateTemporaryToken();
     user.emailVerificationToken = hashedToken;
     user.emailVerificationExpiry = tokenExpiry;
-    await user.save({validateBeforeSave: false});
+    await user.save({ validateBeforeSave: false });
 
     await sendEmail({
         email: user.email,
         subject: "Please verify your email",
         mailGenContent: emailVerificationMailgenContent(
             user.username,
-            `${process.env.CLIENT_URL}/api/v1/users/verify-email/${unHashedToken}`
-        )
+            `${process.env.CLIENT_URL}/verify-email/${unHashedToken}` // notice no extra colon
+        ),
     });
+
     return res
         .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                {},
-                "Mail has been sent to your email ID"
-            )
-        )
-})
+        .json(new ApiResponse(200, {}, "Verification email has been sent. Check your inbox."));
+});
+
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-    const incomingRefreshToken = req.cookie.refreshToken || req.body.refreshToken
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
     if(!incomingRefreshToken){
         throw new ApiError(401, "Unauthorised access")
     }
