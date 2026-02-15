@@ -1,0 +1,46 @@
+services:
+    - type: web
+      name: projmanage-backend
+      runtime: node
+      plan: free
+      buildCommand: npm install
+      startCommand: npm start
+      envVars:
+          - key: NODE_ENV
+            value: production
+
+          # Database
+          - key: MONGO_URI
+            sync: false # You'll add your MongoDB URI in Render dashboard
+
+          # Server
+          - key: PORT
+            value: 8000
+
+          # CORS - You'll update this after frontend deploys
+          - key: CORS_ORIGIN
+            sync: false # Add your Vercel URL here after frontend deploys
+
+          # JWT Tokens
+          - key: ACCESS_TOKEN_SECRET
+            sync: false # Add your access token secret
+          - key: ACCESS_TOKEN_EXPIRY
+            value: 1d # or whatever expiry you use
+          - key: REFRESH_TOKEN_SECRET
+            sync: false # Add your refresh token secret
+          - key: REFRESH_TOKEN_EXPIRY
+            value: 10d # or whatever expiry you use
+
+          # Gmail SMTP (keeping your existing names)
+          - key: MAILTRAP_SMTP_HOST
+            value: smtp.ethereal.email
+          - key: MAILTRAP_SMTP_PORT
+            value: 587
+          - key: MAILTRAP_SMTP_USER
+            sync: false # Your Gmail address
+          - key: MAILTRAP_SMTP_PASS
+            sync: false # Your Gmail app password
+
+          # Client URL - for emails/callbacks
+          - key: CLIENT_URL
+            sync: false # Your frontend URL (same as CORS_ORIGIN)
