@@ -20,7 +20,7 @@ app.use(cookieParser());
 
 //CORS middleware(configuration can be customized as needed)
 app.use(cors({
-    origin: process.env.CORS_ORIGIN?.split(",") || 'http://localhost:3000', // split for multiple origins from env
+    origin: process.env.CORS_ORIGIN?.split(",") || 'https://projectcamp-phi.vercel.app', // split for multiple origins from env
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
