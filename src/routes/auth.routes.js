@@ -6,14 +6,6 @@ import { verifyJWT } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
-// Handle preflight requests
-router.options('*', (req, res) => {
-    res.header('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || 'https://projectcamp-phi.vercel.app');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.sendStatus(200);
-});
 //unsecured routes
 router.route("/register").post(userRegisterValidator(), validate, registerUser);
 router.route("/login").post(userLoginValidator(), validate, login);
