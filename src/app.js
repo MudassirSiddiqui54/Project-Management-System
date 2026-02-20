@@ -19,8 +19,16 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Additionally, handle preflight explicitly
-app.options('*', cors(corsOptions)); // This is crucial!
+app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+        res.header('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || 'https://projectcamp-phi.vercel.app');
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.header('Access-Control-Allow-Credentials', 'true');
+        return res.sendStatus(200);
+    }
+    next();
+});
 
 //To support CORS, you can use this middleware
 //Basic configuration for CORS can be added as needed
