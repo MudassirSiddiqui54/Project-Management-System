@@ -6,6 +6,22 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
+
+
+//CORS middleware(configuration can be customized as needed)
+const corsOptions = {
+    origin: process.env.CORS_ORIGIN || 'https://projectcamp-phi.vercel.app',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
+
+app.use(cors(corsOptions));
+
+// Additionally, handle preflight explicitly
+app.options('*', cors(corsOptions)); // This is crucial!
+
 //To support CORS, you can use this middleware
 //Basic configuration for CORS can be added as needed
 //this is important, otherwise req.body will be undefined
@@ -17,14 +33,6 @@ app.use('/images', express.static('public/images'));
 app.use(express.static('public'));
 //without this middleware, req.cookies will be undefined
 app.use(cookieParser());
-
-//CORS middleware(configuration can be customized as needed)
-app.use(cors({
-    origin: process.env.CORS_ORIGIN?.split(",") || 'https://projectcamp-phi.vercel.app', // split for multiple origins from env
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}));
 
 //import routes after middleware setup(configuration)
 //healthCheckRouter is a placeholder name for the actual router import, same with authRouter
