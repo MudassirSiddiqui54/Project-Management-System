@@ -21,6 +21,13 @@ const sendEmail = async (options) => {
             pass: process.env.MAILTRAP_SMTP_PASS
         }
     })
+    transporter.verify((error, success) => {
+    if (error) {
+        console.error('SMTP connection error:', error);
+    } else {
+        console.log('SMTP server is ready');
+    }
+});
 
     const mail = {
         from: "mail.taskmanager@example.com",
