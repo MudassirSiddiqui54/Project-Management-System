@@ -14,10 +14,10 @@ router.route("/refresh-token").post(refreshAccessToken);
 router.route("/forgot-password").post(userForgotPasswordValidator(), validate, forgotPasswordRequest);
 router.route("/reset-password/:resetToken").post(userResetForgotPasswordValidator(), validate, resetForgotPassword);
 router.route("/logout").post(logoutUser);
+router.route("/resend-email-verification").post(resendEmailVerification);
 
 //Secure routes(verifyJWT)
 router.route("/current-user").post(verifyJWT, getCurrentUser);
 router.route("/change-password").post(verifyJWT, userChangeCurrentPasswordValidator(), validate, changeCurrentPassword);
-router.route("/resend-email-verification").post(verifyJWT, resendEmailVerification);
 
 export default router;
