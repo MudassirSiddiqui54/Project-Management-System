@@ -16,13 +16,10 @@ const sendEmail = async (options) => {
    const transporter = nodemailer.createTransport({
     host: process.env.MAILTRAP_SMTP_HOST,
     port: process.env.MAILTRAP_SMTP_PORT,
-    secure: false, // true for 465, false for 587
+    secure: true, // true for 465, false for 587
     auth: {
         user: process.env.MAILTRAP_SMTP_USER,
         pass: process.env.MAILTRAP_SMTP_PASS
-    },
-    tls: {
-        rejectUnauthorized: false // helps with some network issues
     }
 });
     transporter.verify((error, success) => {
