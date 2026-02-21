@@ -13,14 +13,18 @@ const sendEmail = async (options) => {
     const emailTextual = mailGenerator.generatePlaintext(options.mailGenContent)
     const emailHtml = mailGenerator.generate(options.mailGenContent)
 
-    const transporter = nodemailer.createTransport({
-        host: process.env.MAILTRAP_SMTP_HOST,
-        port: process.env.MAILTRAP_SMTP_PORT,
-        auth: {
-            user: process.env.MAILTRAP_SMTP_USER,
-            pass: process.env.MAILTRAP_SMTP_PASS
-        }
-    })
+   const transporter = nodemailer.createTransport({
+    host: process.env.MAILTRAP_SMTP_HOST,
+    port: process.env.MAILTRAP_SMTP_PORT,
+    secure: false, // true for 465, false for 587
+    auth: {
+        user: process.env.MAILTRAP_SMTP_USER,
+        pass: process.env.MAILTRAP_SMTP_PASS
+    },
+    tls: {
+        rejectUnauthorized: false // helps with some network issues
+    }
+});
     transporter.verify((error, success) => {
     if (error) {
         console.error('SMTP connection error:', error);
