@@ -14,6 +14,7 @@ const sendEmail = async (options) => {
     const emailHtml = mailGenerator.generate(options.mailGenContent)
 
    const transporter = nodemailer.createTransport({
+    service : 'gmail',
     host: process.env.MAILTRAP_SMTP_HOST,
     port: process.env.MAILTRAP_SMTP_PORT,
     secure: true, // true for 465, false for 587
